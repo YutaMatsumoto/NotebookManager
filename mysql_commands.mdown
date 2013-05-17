@@ -1,0 +1,121 @@
+# Entiti Sets
+
+create table tag (
+   tagname VARCHAR(100) NOT NULL PRIMARY KEY, 
+   description VARCHAR(101)
+);
+
+create table note (
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(100),
+    tagname VARCHAR(101),
+    content TEXT,
+  
+    foreign key (tagname) references tag(tagname)
+       ON DELETE CASCADE
+       ON UPDATE CASCADE
+);
+
+create table author (
+    username VARCHAR(102) NOT NULL PRIMARY KEY,
+    password VARCHAR(103) NOT NULL
+);
+
+create table notebook (
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(104) NOT NULL,
+    tagname VARCHAR(100),
+
+    foreign key (tagname) references tag(tagname)
+       ON DELETE CASCADE
+       ON UPDATE CASCADE
+);
+
+# Relationship Sets
+
+create table notetag (
+    tagname VARCHAR(100) NOT NULL, 
+    noteid INT NOT NULL,
+
+    foreign key (tagname) references tag(tagname)
+       ON DELETE CASCADE
+       ON UPDATE CASCADE,
+    foreign key (noteid) references note(id),
+    primary key (tagname, noteid)
+);
+
+create table notebook_notes (
+    notebook_id INT,
+    note_id INT,
+  
+    foreign key (notebook_id) references notebook(id)
+       ON DELETE CASCADE
+       ON UPDATE CASCADE,
+    foreign key (note_id) references note(id)
+       ON DELETE CASCADE
+       ON UPDATE CASCADE,
+    primary key (notebook_id, note_id)
+);
+
+create table notebook_author (
+    notebook_id INT, 
+    notebook_author VARCHAR(102),
+  
+    foreign key (notebook_id) references notebook(id)
+       ON DELETE CASCADE
+       ON UPDATE CASCADE,
+    foreign key (notebook_author) references author(username)
+       ON DELETE CASCADE
+       ON UPDATE CASCADE,
+    primary key (notebook_id, notebook_author)
+);
+
+create table note_hierarchy (
+    parent INT,
+    child INT, 
+
+    foreign key (parent) references note(id)
+       ON DELETE CASCADE
+       ON UPDATE CASCADE,
+    foreign key (child) references note(id)
+       ON DELETE CASCADE
+       ON UPDATE CASCADE,
+    primary key (parent, child)
+);
+
+create table edited_by (
+    note_id INT,
+    author VARCHAR(103),
+
+    foreign key (note_id) references note(id)
+       ON DELETE CASCADE
+       ON UPDATE CASCADE,
+    foreign key (author) references author(username)
+       ON DELETE CASCADE
+       ON UPDATE CASCADE,
+    primary key (note_id, author)
+);
+
+
+# functions
+
+delimiter //
+
+create procedure createAuthor(IN uid VARCHAR(102), IN pass VARCHAR(103))
+begin
+    insert into `author` (`username`, `password`) values ("asdf", "asdf");
+    # insert into `author` (`username`, `password`) values (uid, pass);
+end//
+
+delimiter //
+
+create procedure createNote(IN title VARCHAR(100), IN username VARCHAR(102) )
+begin 
+    # TODO : check the author(by username) exists
+    # MAYBE : check authentification
+    insert into `note` (`title`) values (title);
+end//
+
+delimiter ;
+
+
